@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/3c1u/catechdojo/db"
@@ -55,6 +56,7 @@ func HandleUserCreate(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.UserCreate(request.Name)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
@@ -88,6 +90,7 @@ func HandleUserGet(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.UserGet(token)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
@@ -157,6 +160,7 @@ func HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.UserGet(token)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
@@ -181,6 +185,7 @@ func HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
 	user.Name = request.Name
 	err = db.UserUpdate(user)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{

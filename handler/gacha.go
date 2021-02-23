@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/3c1u/catechdojo/db"
@@ -65,6 +66,7 @@ func HandleGachaDraw(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.UserGet(token)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
@@ -88,6 +90,7 @@ func HandleGachaDraw(w http.ResponseWriter, r *http.Request) {
 
 	c, err := db.DrawGacha(user.ID, request.Times)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{

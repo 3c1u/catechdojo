@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/3c1u/catechdojo/db"
@@ -38,6 +39,7 @@ func HandleCharacterList(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.UserGet(token)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
@@ -61,6 +63,7 @@ func HandleCharacterList(w http.ResponseWriter, r *http.Request) {
 
 	c, err := db.EnumerateUserCharacters(user.ID)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
