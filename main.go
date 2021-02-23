@@ -17,7 +17,6 @@ func main() {
 
 	log.Println("Launching server...")
 	router := mux.NewRouter()
-	router.HandleFunc("/", handler.HandleRoot)
 
 	// user
 	router.HandleFunc("/user/create", handler.HandleUserCreate).Methods("POST")
