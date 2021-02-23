@@ -35,8 +35,8 @@ func HandleUserCreate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to read the request",
-				"desription": err.Error(),
+				"error":       "failed to read the request",
+				"description": err.Error(),
 			},
 		)
 		return
@@ -46,8 +46,8 @@ func HandleUserCreate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to unmarshal request",
-				"desription": err.Error(),
+				"error":       "failed to unmarshal request",
+				"description": err.Error(),
 			},
 		)
 		return
@@ -58,8 +58,8 @@ func HandleUserCreate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to create a user",
-				"desription": err.Error(),
+				"error":       "failed to create a user",
+				"description": err.Error(),
 			},
 		)
 		return
@@ -79,8 +79,8 @@ func HandleUserGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "empty token",
-				"desription": "",
+				"error":       "empty token",
+				"description": "",
 			},
 		)
 		return
@@ -91,8 +91,8 @@ func HandleUserGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to get a user",
-				"desription": err.Error(),
+				"error":       "failed to get a user",
+				"description": err.Error(),
 			},
 		)
 		return
@@ -102,8 +102,8 @@ func HandleUserGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to get a user",
-				"desription": "user not found",
+				"error":       "failed to get a user",
+				"description": "user not found",
 			},
 		)
 		return
@@ -125,8 +125,8 @@ func HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to read the request",
-				"desription": err.Error(),
+				"error":       "failed to read the request",
+				"description": err.Error(),
 			},
 		)
 		return
@@ -136,8 +136,8 @@ func HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to unmarshal request",
-				"desription": err.Error(),
+				"error":       "failed to unmarshal request",
+				"description": err.Error(),
 			},
 		)
 		return
@@ -148,8 +148,8 @@ func HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "empty token",
-				"desription": "",
+				"error":       "empty token",
+				"description": "",
 			},
 		)
 		return
@@ -160,8 +160,8 @@ func HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to get a user",
-				"desription": err.Error(),
+				"error":       "failed to get a user",
+				"description": err.Error(),
 			},
 		)
 		return
@@ -171,8 +171,8 @@ func HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to get a user",
-				"desription": "user not found",
+				"error":       "failed to get a user",
+				"description": "user not found",
 			},
 		)
 		return
@@ -184,8 +184,8 @@ func HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to update a user profile",
-				"desription": err.Error(),
+				"error":       "failed to update a user profile",
+				"description": err.Error(),
 			},
 		)
 		return
