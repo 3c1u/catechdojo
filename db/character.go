@@ -40,7 +40,7 @@ func DrawGacha(userID uint, times int) (userCharacters []UserCharacter, err erro
 		return
 	}
 
-	characters, err := PickCharacters(times)
+	characters, err := pickCharacters(times)
 	if err != nil {
 		return
 	}
@@ -52,7 +52,23 @@ func DrawGacha(userID uint, times int) (userCharacters []UserCharacter, err erro
 		}
 		userCharacters = append(userCharacters, character)
 	}
-	err = db.Create(&userCharacters).Error
+
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Create(&userCharacters).Error; err != nil {
+		tx.Rollback()
+		return
+	}
+
+	if err = tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return
+	}
 
 	for i := 0; i < times; i++ {
 		userCharacters[i].Character = characters[i]
@@ -61,17 +77,12 @@ func DrawGacha(userID uint, times int) (userCharacters []UserCharacter, err erro
 	return
 }
 
-func PickCharacters(times int) (characters []Character, err error) {
+func pickCharacters(times int) (characters []Character, err error) {
 	var character Character
-
-	if db == nil {
-		err = fmt.Errorf("no database connection")
-		return
-	}
 
 	for i := 0; i < times; i++ {
 		// FIXME: ループ内でのクエリ実行（timesは十分小さいとはいえ...）
-		character, err = PickCharacter()
+		character, err = pickCharacter()
 		if err != nil {
 			characters = nil
 			return
@@ -83,12 +94,7 @@ func PickCharacters(times int) (characters []Character, err error) {
 	return
 }
 
-func PickCharacter() (character Character, err error) {
-	if db == nil {
-		err = fmt.Errorf("no database connection")
-		return
-	}
-
+func pickCharacter() (character Character, err error) {
 	// TODO: ガチャが膨れ上がった時にtotal_rate, sum_rateはキャッシュしたほうが良い気がする
 	err = db.Raw(`with
 				characters_with_sum as (select
