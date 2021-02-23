@@ -1,17 +1,24 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/3c1u/catechdojo/db"
 	"github.com/3c1u/catechdojo/handler"
 	"github.com/gorilla/mux"
-	"github.com/rs/cors"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load(fmt.Sprintf("./%s.env", os.Getenv("GO_ENV")))
+	if err != nil {
+		log.Fatalln("failed to load envfile", err)
+	}
+
 	log.Println("Connecting to database...")
 	db.Init()
 
@@ -29,8 +36,8 @@ func main() {
 	// character
 	router.HandleFunc("/character/list", handler.HandleCharacterList).Methods("GET")
 
-	// NOTE: Swagger Editorでテストするために，CORS許可している．
-	c := cors.New(cors.Options{
+	// NOTE: Swagger EditorでテストするためにはCORS許可が必要（"github.com/rs/cors"使用）
+	/* c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{
 			http.MethodGet,
@@ -46,13 +53,13 @@ func main() {
 		},
 		AllowCredentials: true,
 	})
-	handler := c.Handler(router)
+	handler := c.Handler(router) */
 
 	// TODO: 環境変数から読み取る
-	addr := "0.0.0.0:8080"
+	addr := os.Getenv("ADDR")
 
 	server := &http.Server{
-		Handler:      handler,
+		Handler:      router,
 		Addr:         addr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,

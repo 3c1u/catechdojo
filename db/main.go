@@ -2,6 +2,7 @@ package db
 
 import (
 	"log"
+	"os"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -14,7 +15,7 @@ func Init() {
 	var err error
 
 	// TODO: 環境変数から読み取る
-	dsn := "catechdojo:#CATechDojo1017@tcp(127.0.0.1:3306)/catechdojo?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := os.Getenv("DB_ADDR")
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
