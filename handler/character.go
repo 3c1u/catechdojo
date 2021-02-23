@@ -64,7 +64,7 @@ func HandleCharacterList(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to get a user",
+				"error":      "failed to enumerate a character",
 				"desription": err.Error(),
 			},
 		)

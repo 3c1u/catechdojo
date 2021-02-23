@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -10,6 +9,10 @@ import (
 )
 
 type UserCreateRequest struct {
+	Name string `json:"name"`
+}
+
+type UserUpdateRequest struct {
 	Name string `json:"name"`
 }
 
@@ -113,6 +116,80 @@ func HandleUserGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
+	var request UserUpdateRequest
+
+	w.Header().Set("Content-Type", "application/json")
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(
+			map[string]string{
+				"error":      "failed to read the request",
+				"desription": err.Error(),
+			},
+		)
+		return
+	}
+
+	if err = json.Unmarshal(reqBody, &request); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(
+			map[string]string{
+				"error":      "failed to unmarshal request",
+				"desription": err.Error(),
+			},
+		)
+		return
+	}
+
+	token := r.Header.Get("x-token")
+	if token == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(
+			map[string]string{
+				"error":      "empty token",
+				"desription": "",
+			},
+		)
+		return
+	}
+
+	user, err := db.UserGet(token)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(
+			map[string]string{
+				"error":      "failed to get a user",
+				"desription": err.Error(),
+			},
+		)
+		return
+	}
+
+	if user == nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(
+			map[string]string{
+				"error":      "failed to get a user",
+				"desription": "user not found",
+			},
+		)
+		return
+	}
+
+	user.Name = request.Name
+	err = db.UserUpdate(user)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(
+			map[string]string{
+				"error":      "failed to update a user profile",
+				"desription": err.Error(),
+			},
+		)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "Hello, world!")
 }

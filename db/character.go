@@ -49,12 +49,15 @@ func DrawGacha(userID uint, times int) (userCharacters []UserCharacter, err erro
 		character := UserCharacter{
 			UserID:      userID,
 			CharacterID: characters[i].ID,
-			Character:   characters[i],
 		}
 		userCharacters = append(userCharacters, character)
 	}
-
 	err = db.Create(&userCharacters).Error
+
+	for i := 0; i < times; i++ {
+		userCharacters[i].Character = characters[i]
+	}
+
 	return
 }
 
@@ -87,7 +90,7 @@ func PickCharacter() (character Character, err error) {
 	}
 
 	// TODO: ガチャが膨れ上がった時にtotal_rate, sum_rateはキャッシュしたほうが良い気がする
-	db.Raw(`with
+	err = db.Raw(`with
 				characters_with_sum as (select
 					id,
 					name,
@@ -101,7 +104,7 @@ func PickCharacter() (character Character, err error) {
 			where
 				sum_rate > total_rate * random_rate
 			order by rate desc, rand()
-			limit 1;`).Scan(&character)
+			limit 1`).Scan(&character).Error
 
 	return
 }

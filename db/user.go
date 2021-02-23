@@ -62,3 +62,12 @@ func UserGet(token string) (user *User, err error) {
 
 	return
 }
+
+// UserUpdate updates a user info.
+func UserUpdate(user *User) error {
+	if db == nil {
+		return fmt.Errorf("no database connection")
+	}
+
+	return db.Where("id = ?", user.ID).Save(&user).Error
+}

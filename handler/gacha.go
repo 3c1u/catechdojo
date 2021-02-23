@@ -91,7 +91,7 @@ func HandleGachaDraw(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(
 			map[string]string{
-				"error":      "failed to get a user",
+				"error":      "failed to draw gacha",
 				"desription": err.Error(),
 			},
 		)
