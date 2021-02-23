@@ -2,6 +2,8 @@ package db
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -30,6 +32,59 @@ type UserCharacter struct {
 	Character   Character
 }
 
+var rarity []Rarity
+var charactersByRarityID map[int][]Character
+var invalidateAt time.Time
+
+func cacheGachaRarity() error {
+	if db == nil {
+		return fmt.Errorf("no database connection")
+	}
+
+	db.Order("rate").Find(&rarity)
+
+	return nil
+}
+
+func cacheGachaCharacters() error {
+	if db == nil {
+		return fmt.Errorf("no database connection")
+	}
+
+	var charactersList []Character
+	db.Find(&charactersList)
+
+	charactersByRarityID = map[int][]Character{}
+
+	for i := 0; i < len(charactersList); i++ {
+		item := charactersList[i]
+		charactersByRarityID[item.RarityID] = append(charactersByRarityID[item.RarityID], item)
+	}
+
+	return nil
+}
+
+func cacheData() error {
+	// already cached
+	if rarity != nil && charactersByRarityID != nil && invalidateAt.After(time.Now()) {
+		return nil
+	}
+
+	invalidateAt = time.Now().Add(10 * time.Minute)
+
+	fmt.Println("cache gacha data...")
+
+	if err := cacheGachaRarity(); err != nil {
+		return err
+	}
+	if err := cacheGachaCharacters(); err != nil {
+		return err
+	}
+
+	fmt.Println("cache gacha data done")
+	return nil
+}
+
 // EnumerateUserCharacters enumerates characters that a user has.
 func EnumerateUserCharacters(userID uint) (characters []UserCharacter, err error) {
 	if db == nil {
@@ -46,6 +101,10 @@ func EnumerateUserCharacters(userID uint) (characters []UserCharacter, err error
 func DrawGacha(userID uint, times int) (userCharacters []UserCharacter, err error) {
 	if db == nil {
 		err = fmt.Errorf("no database connection")
+		return
+	}
+
+	if err = cacheData(); err != nil {
 		return
 	}
 
@@ -87,17 +146,21 @@ func DrawGacha(userID uint, times int) (userCharacters []UserCharacter, err erro
 }
 
 func pickCharacters(times int) (characters []Character, err error) {
-	var character Character
-
 	for i := 0; i < times; i++ {
-		// FIXME: ループ内でのクエリ実行（timesは十分小さいとはいえ...）
-		character, err = pickCharacter()
-		if err != nil {
-			characters = nil
-			return
+		rate := rand.Float64()
+		idx := 0
+		for j := 0; j < len(rarity); j++ {
+			if rate < rarity[j].Rate {
+				break
+			}
+			idx = j
 		}
 
-		characters = append(characters, character)
+		rarityID := int(rarity[idx].ID)
+		charactersByRarity := charactersByRarityID[rarityID]
+		characterIdx := rand.Int() % len(charactersByRarity)
+
+		characters = append(characters, charactersByRarity[characterIdx])
 	}
 
 	return

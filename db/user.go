@@ -52,7 +52,7 @@ func UserGet(token string) (user *User, err error) {
 	}
 
 	user = &User{}
-	if err = db.Find(&user, "token = ?", token).Error; err != nil {
+	if err = db.First(&user, "token = ?", token).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			err = nil
 		}
