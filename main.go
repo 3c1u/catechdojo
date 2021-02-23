@@ -30,6 +30,7 @@ func main() {
 	// character
 	router.HandleFunc("/character/list", handler.HandleCharacterList).Methods("GET")
 
+	// NOTE: Swagger Editorでテストするために，CORS許可している．
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{
@@ -47,12 +48,17 @@ func main() {
 		AllowCredentials: true,
 	})
 	handler := c.Handler(router)
+
+	// TODO: 環境変数から読み取る
+	addr := "0.0.0.0:8080"
+
 	server := &http.Server{
 		Handler:      handler,
-		Addr:         "0.0.0.0:8080",
+		Addr:         addr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
+	log.Println("Listening to:", addr)
 	log.Fatal(server.ListenAndServe())
 }

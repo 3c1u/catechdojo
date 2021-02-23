@@ -13,6 +13,7 @@ var db *gorm.DB
 func Init() {
 	var err error
 
+	// TODO: 環境変数から読み取る
 	dsn := "catechdojo:#CATechDojo1017@tcp(127.0.0.1:3306)/catechdojo?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
@@ -20,9 +21,13 @@ func Init() {
 		log.Fatalln("failed to establish the connection between the database", err)
 	}
 
-	err = db.AutoMigrate(&User{})
+	log.Println("Connected to database")
+
+	err = db.AutoMigrate(&User{}, &UserCharacter{}, &Character{})
 
 	if err != nil {
 		log.Fatalln("failed to migrate the database", err)
 	}
+
+	log.Println("Migration done")
 }
