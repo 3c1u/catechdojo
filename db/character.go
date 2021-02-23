@@ -104,7 +104,7 @@ func pickCharacter() (character Character, err error) {
 					sum(rate) over(order by id) as sum_rate,
 					sum(rate) over() as total_rate
 				from characters),
-				random_rate as (select rand() random_rate)
+				random_rate as (select rand() as random_rate)
 			select id, name from
 				characters_with_sum, random_rate
 			where
