@@ -9,6 +9,14 @@ import (
 // Character describes a model of a character.
 type Character struct {
 	gorm.Model
+	Name     string
+	RarityID int
+	Rarity   Rarity
+}
+
+// Rarity describes a model of a rarity of a characcter.
+type Rarity struct {
+	gorm.Model
 	Name string
 	Rate float64
 }
@@ -34,6 +42,7 @@ func EnumerateUserCharacters(userID uint) (characters []UserCharacter, err error
 	return
 }
 
+// DrawGacha draws gacha for given times.
 func DrawGacha(userID uint, times int) (userCharacters []UserCharacter, err error) {
 	if db == nil {
 		err = fmt.Errorf("no database connection")
@@ -95,22 +104,24 @@ func pickCharacters(times int) (characters []Character, err error) {
 }
 
 func pickCharacter() (character Character, err error) {
-	// TODO: ガチャが膨れ上がった時にtotal_rate, sum_rateはキャッシュしたほうが良い気がする
-	err = db.Raw(`with
-				characters_with_sum as (select
-					id,
-					name,
-					rate,
-					sum(rate) over(order by id) as sum_rate,
-					sum(rate) over() as total_rate
-				from characters),
-				random_rate as (select rand() as random_rate)
-			select id, name from
-				characters_with_sum, random_rate
-			where
-				sum_rate > total_rate * random_rate
-			order by rate desc, rand()
-			limit 1`).Scan(&character).Error
+	err = db.Raw(`
+	with
+		rarity as (select rand() as rarity),
+		characters_with_rarity as (
+			select
+				characters.id as id,
+				characters.name as name,
+				rate
+			from characters
+			join rarities
+			on characters.rarity_id = rarities.id
+		)
+	select id, name, rate, rarity from
+		characters_with_rarity, rarity
+	where rate < rarity
+	order by rate desc, rand()
+	limit 1
+	`).Scan(&character).Error
 
 	return
 }

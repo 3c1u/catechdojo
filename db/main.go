@@ -24,7 +24,7 @@ func Init() {
 
 	log.Println("Connected to database")
 
-	err = db.AutoMigrate(&User{}, &UserCharacter{}, &Character{})
+	err = db.AutoMigrate(&User{}, &Rarity{}, &Character{}, &UserCharacter{})
 
 	if err != nil {
 		log.Fatalln("failed to migrate the database", err)

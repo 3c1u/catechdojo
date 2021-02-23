@@ -1,11 +1,15 @@
-with characters_with_sum as (select name,
-            rate,
-        sum(rate) over(order by id) as sum_rate,
-        sum(rate) over() as total_rate
-    from characters)
-select * from
-    characters_with_sum
-     where
-    sum_rate > total_rate * rand()
-     order by rate desc, rand()
-     limit 1;
+with
+    rarity as (select rand() as rarity),
+    characters_with_rarity as (
+        select
+            characters.id as id,
+            characters.name as name,
+            rate
+        from characters
+        join rarities
+        on characters.rarity_id = rarities.id
+    )
+select id, name, rate, rarity from
+    characters_with_rarity, rarity
+where rate < rarity
+order by rate desc, rand();
