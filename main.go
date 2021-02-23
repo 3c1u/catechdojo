@@ -11,6 +11,7 @@ import (
 	"github.com/3c1u/catechdojo/handler"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -37,7 +38,7 @@ func main() {
 	router.HandleFunc("/character/list", handler.HandleCharacterList).Methods("GET")
 
 	// NOTE: Swagger EditorでテストするためにはCORS許可が必要（"github.com/rs/cors"使用）
-	/* c := cors.New(cors.Options{
+	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{
 			http.MethodGet,
@@ -53,13 +54,13 @@ func main() {
 		},
 		AllowCredentials: true,
 	})
-	handler := c.Handler(router) */
+	handler := c.Handler(router)
 
 	// TODO: 環境変数から読み取る
 	addr := os.Getenv("ADDR")
 
 	server := &http.Server{
-		Handler:      router,
+		Handler:      handler,
 		Addr:         addr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
